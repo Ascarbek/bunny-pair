@@ -1,0 +1,21 @@
+# dependencies
+node_modules
+
+# testing
+coverage
+/lib/dumbs
+
+# misc
+.idea
+/temp
+tsconfig.tsbuildinfo
+yarn-error.log
+/file
+
+# build
+/dist
+
+# sensitive
+/src/datasource.json
+.env
+service-account.json
