@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import type { RequestHandler } from 'express';
 import dayjs from 'dayjs';
 
 const logger: RequestHandler<any, any, any, any> = async (req, res, next) => {

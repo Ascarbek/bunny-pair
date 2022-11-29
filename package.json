@@ -1,8 +1,8 @@
 {
   "name": "bunny-pairs",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Pair Info Server",
+  "main": "dist/server.js",
   "scripts": {
     "watch": "node src/watch.js",
     "run": "tsc && node .",
@@ -24,6 +24,7 @@
     "csprng": "^0.1.2",
     "dayjs": "^1.10.4",
     "dotenv": "^8.2.0",
+    "ethers": "^5.7.2",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "express-joi-validation": "^5.0.0",
