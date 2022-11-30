@@ -2,40 +2,38 @@ import db from '../db';
 import { ContainerTypes, ValidatedRequest, ValidatedRequestSchema } from 'express-joi-validation';
 import Joi from 'joi';
 import { ethers } from 'ethers';
-import { Routers } from './Routers';
 import uniRouter from '../ABI/uniRouter';
 import factoryABI from '../ABI/factory';
 import LPToken from '../ABI/LPToken';
 import { BigNumber } from 'ethers';
+import { BASE, null_address } from '../helpers/constants';
+import getProvider from '../helpers/getProvider';
 
 interface GetPairAddressRequest {
   token0: string;
   token1: string;
+  chain_id: number;
 }
 
 export const getPairAddressSchema = Joi.object({
   token0: Joi.string().required(),
   token1: Joi.string().required(),
+  chain_id: Joi.number().required(),
 });
 
 interface GetPairAddressSchema extends ValidatedRequestSchema {
   [ContainerTypes.Query]: GetPairAddressRequest;
 }
 
-const null_address = '0x0000000000000000000000000000000000000000';
-const BASE = 'ETH';
-
 const getPairAddress = async (req: ValidatedRequest<GetPairAddressSchema>, res: any) => {
-  const { token0, token1 } = req.query;
+  const { token0, token1, chain_id } = req.query;
 
-  const routers = await db('router').where('chain_id', 56);
-  const provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed1.binance.org', 56);
+  const routers = await db('router').where('chain_id', chain_id);
+  const provider = getProvider(chain_id);
 
-  let result: { name: string; pairAddress: string }[] = [];
+  let result: any[] = [];
 
   for (const routerData of routers) {
-    // if (routerData.id !== 27) continue;
-    // console.log(routerData);
     const routerAddress = routerData.address;
 
     try {
@@ -44,23 +42,38 @@ const getPairAddress = async (req: ValidatedRequest<GetPairAddressSchema>, res: 
       const factory = new ethers.Contract(factoryAddress, factoryABI, provider);
 
       let wrappedNative = await router.WETH();
-      const pairAddress = await factory.getPair(
-        token0 === BASE ? wrappedNative : token0,
-        token1 === BASE ? wrappedNative : token1
-      );
+      const wToken0 = token0 === BASE ? wrappedNative : token0;
+      const wToken1 = token1 === BASE ? wrappedNative : token1;
+
+      const pairAddress = await factory.getPair(wToken0, wToken1);
 
       if (pairAddress === null_address) {
         continue;
       }
 
       const pair = new ethers.Contract(pairAddress, LPToken, provider);
-      const resData = await pair.getReserves();
-      console.log(resData._reserve0, resData._reserve1);
-      console.log(BigNumber.from(resData._reserve0._hex).toString(), BigNumber.from(resData._reserve1._hex).toString());
+
+      const pairToken0 = await pair.token0();
+      const pairToken1 = await pair.token1();
+      const inOrder =
+        pairToken0.toLowerCase() === wToken0.toLowerCase() && pairToken1.toLowerCase() === wToken1.toLowerCase();
+
+      const reserves = await pair.getReserves();
+      const reserve0 = BigNumber.from(reserves._reserve0._hex).toString();
+      const reserve1 = BigNumber.from(reserves._reserve1._hex).toString();
+      const supply = BigNumber.from((await pair.totalSupply())._hex).toString();
 
       result.push({
-        name: routerData.name,
-        pairAddress,
+        chain_id: chain_id,
+        router: routerAddress.toLowerCase(),
+        factory: factoryAddress.toLowerCase(),
+        token0: inOrder ? token0.toLowerCase() : token1.toLowerCase(),
+        token1: inOrder ? token1.toLowerCase() : token0.toLowerCase(),
+        token0wrapped: inOrder ? wToken0.toLowerCase() : wToken1.toLowerCase(),
+        token1wrapped: inOrder ? wToken1.toLowerCase() : wToken0.toLowerCase(),
+        reserve0,
+        reserve1,
+        supply,
       });
     } catch (e) {
       // mute

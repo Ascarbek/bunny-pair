@@ -1,5 +1,5 @@
 import db from '../db';
-import { Routers } from '../handlers/Routers';
+import { Routers } from './Routers';
 
 (async () => {
   let all: { chain_id: number; name: string; address: string; base: string; logo: string }[] = [];
