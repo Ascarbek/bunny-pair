@@ -34,8 +34,8 @@ const getPairAddress = async (req: ValidatedRequest<GetPairAddressSchema>, res: 
   let result: { name: string; pairAddress: string }[] = [];
 
   for (const routerData of routers) {
-    if (routerData.id !== 27) continue;
-    console.log(routerData);
+    // if (routerData.id !== 27) continue;
+    // console.log(routerData);
     const routerAddress = routerData.address;
 
     try {
@@ -55,14 +55,8 @@ const getPairAddress = async (req: ValidatedRequest<GetPairAddressSchema>, res: 
 
       const pair = new ethers.Contract(pairAddress, LPToken, provider);
       const resData = await pair.getReserves();
-      console.log(
-        BigNumber.from(resData._reserve0._hex)
-
-          .toNumber(),
-        BigNumber.from(resData._reserve1._hex)
-
-          .toNumber()
-      );
+      console.log(resData._reserve0, resData._reserve1);
+      console.log(BigNumber.from(resData._reserve0._hex).toString(), BigNumber.from(resData._reserve1._hex).toString());
 
       result.push({
         name: routerData.name,

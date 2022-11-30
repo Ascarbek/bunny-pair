@@ -16,9 +16,13 @@ import { Routers } from '../handlers/Routers';
   });
 
   for (const item of all) {
-    await db('router').insert({
-      ...item,
-    });
+    try {
+      await db('router').insert({
+        ...item,
+      });
+    } catch (e) {
+      // mute
+    }
   }
 
   process.exit(0);
