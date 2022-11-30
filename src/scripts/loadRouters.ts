@@ -1,7 +1,7 @@
 import db from '../db';
 import { Routers } from './Routers';
 
-(async () => {
+export default async () => {
   let all: { chain_id: number; name: string; address: string; base: string; logo: string }[] = [];
   Object.keys(Routers).forEach((id) => {
     Routers[parseInt(id)].forEach((item) => {
@@ -24,6 +24,4 @@ import { Routers } from './Routers';
       // mute
     }
   }
-
-  process.exit(0);
-})();
+};

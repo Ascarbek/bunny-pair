@@ -1,14 +1,14 @@
 import db from '../db';
 import allTokens from './allTokens';
 
-(async () => {
+export default async () => {
   let all: { name: string; symbol: string; address: string; chain_id: number; decimals: number; logo: string }[] = [];
 
   allTokens.forEach((item) => {
     all.push({
       name: item.name,
       symbol: item.symbol,
-      address: item.address,
+      address: item.address.toLowerCase(),
       chain_id: item.chainId,
       decimals: item.decimals,
       logo: item.logoURI || '',
@@ -24,6 +24,4 @@ import allTokens from './allTokens';
       // mute
     }
   }
-
-  process.exit(0);
-})();
+};

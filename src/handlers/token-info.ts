@@ -1,14 +1,6 @@
-import db from '../db';
 import { ContainerTypes, ValidatedRequest, ValidatedRequestSchema } from 'express-joi-validation';
 import Joi from 'joi';
-import { ethers } from 'ethers';
-import uniRouter from '../ABI/uniRouter';
-import factoryABI from '../ABI/factory';
-import LPToken from '../ABI/LPToken';
-import { BigNumber } from 'ethers';
-import { BASE, null_address } from '../helpers/constants';
-import getProvider from '../helpers/getProvider';
-import tokenInfo from '../helpers/getTokenInfo';
+import tokenInfo from '../helpers/getTokenInfoOnChain';
 
 interface GetTokenInfoRequest {
   token: string;

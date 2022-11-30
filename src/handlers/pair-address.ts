@@ -8,6 +8,8 @@ import LPToken from '../ABI/LPToken';
 import { BigNumber } from 'ethers';
 import { BASE, null_address } from '../helpers/constants';
 import getProvider from '../helpers/getProvider';
+import getTokenInfoDb from '../helpers/getTokenInfoDb';
+import getTokenInfoOnChain from '../helpers/getTokenInfoOnChain';
 
 interface GetPairAddressRequest {
   token0: string;
@@ -63,14 +65,40 @@ const getPairAddress = async (req: ValidatedRequest<GetPairAddressSchema>, res: 
       const reserve1 = BigNumber.from(reserves._reserve1._hex).toString();
       const supply = BigNumber.from((await pair.totalSupply())._hex).toString();
 
+      const token0infoDb = await getTokenInfoDb(chain_id, pairToken0.toLowerCase());
+      const token1infoDb = await getTokenInfoDb(chain_id, pairToken1.toLowerCase());
+
+      let decimals0 = 0;
+      let decimals1 = 0;
+
+      if (!token0infoDb) {
+        const token0infoChain = await getTokenInfoOnChain(chain_id, pairToken0);
+        if (token0infoChain) {
+          decimals0 = token0infoChain.decimals;
+        }
+      } else {
+        decimals0 = token0infoDb.decimals;
+      }
+
+      if (!token1infoDb) {
+        const token1infoChain = await getTokenInfoOnChain(chain_id, pairToken1);
+        if (token1infoChain) {
+          decimals1 = token1infoChain.decimals;
+        }
+      } else {
+        decimals1 = token1infoDb.decimals;
+      }
+
       result.push({
         chain_id: chain_id,
         router: routerAddress.toLowerCase(),
         factory: factoryAddress.toLowerCase(),
         token0: inOrder ? token0.toLowerCase() : token1.toLowerCase(),
         token1: inOrder ? token1.toLowerCase() : token0.toLowerCase(),
-        token0wrapped: inOrder ? wToken0.toLowerCase() : wToken1.toLowerCase(),
-        token1wrapped: inOrder ? wToken1.toLowerCase() : wToken0.toLowerCase(),
+        token0wrapped: pairToken0.toLowerCase(),
+        token1wrapped: pairToken1.toLowerCase(),
+        decimals0,
+        decimals1,
         reserve0,
         reserve1,
         supply,

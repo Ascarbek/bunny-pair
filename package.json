@@ -6,7 +6,8 @@
   "scripts": {
     "watch": "node src/watch.js",
     "run": "tsc && node .",
-    "serve:images": "serve -s file -l 5005"
+    "serve:images": "serve -s file -l 5005",
+    "init:db": "tsc && node dist/initDatabase.js"
   },
   "dependencies": {
     "@types/cors": "^2.8.10",
