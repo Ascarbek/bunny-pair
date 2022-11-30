@@ -20,6 +20,6 @@ app.use(logger);
 app.use(auth);
 app.use(router);
 
-app.listen(port, '127.0.0.1', () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`bunny-pairs backend is listening on port ${port}`);
 });
