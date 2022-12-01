@@ -192,12 +192,12 @@ export const Routers: IRouters = {
       base: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
       logoURI: '/images/dex/PCSv1.png',
     },
-    {
+    /*{
       name: 'ElkSwap BSC',
       address: '0xA63B831264183D755756ca9AE5190fF5183d65D6',
       base: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
       logoURI: '/images/dex/ElkFinance.png',
-    },
+    },*/
     {
       name: 'KnightSwap BSC',
       address: '0x05E61E0cDcD2170a76F9568a110CEe3AFdD6c46f',
@@ -234,12 +234,12 @@ export const Routers: IRouters = {
       base: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
       logoURI: '/images/dex/MarsSwap.png',
     },
-    {
+    /*{
       name: 'SheepDex BSC',
       address: '0xcD87782A717F40542e18C61Ebb7210d3132e17d8',
       base: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
       logoURI: '/images/dex/SheepDex.png',
-    },
+    },*/
     {
       name: 'Empire BSC',
       address: '0xdADaae6cDFE4FA3c35d54811087b3bC3Cd60F348',
@@ -251,12 +251,12 @@ export const Routers: IRouters = {
       base: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
       logoURI: '/images/dex/JetSwap.png',
     },
-    {
+  /*  {
       name: 'HyperJump BSC',
       address: '0x3bc677674df90A9e5D741f28f6CA303357D0E4Ec',
       base: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
       logoURI: '/images/dex/HyperJump.png',
-    },
+    },*/
   ],
   25: [
     {
