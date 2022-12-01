@@ -75,7 +75,7 @@ const getPairReserves: (chain_id: number, token0: string, token1: string) => Pro
     }
     const k = i - skip;
 
-    const routerAddress = routers[k].address;
+    const routerAddress = routers[i].address;
     const factoryAddress = factoryWethResponses[k * 2];
     const wrappedNative = factoryWethResponses[k * 2 + 1];
 

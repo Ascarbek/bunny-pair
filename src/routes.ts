@@ -47,4 +47,7 @@ router.get('/pair-reserves', validator.query(getPairReservesSchema), getPairRese
 import getTokenInfo, { getTokenInfoSchema } from './handlers/token-info';
 router.get('/token-info', validator.query(getTokenInfoSchema), getTokenInfo);
 
+import getAllReserves, { getAllReservesSchema } from './handlers/update-all';
+router.get('/update-all', validator.query(getAllReservesSchema), getAllReserves);
+
 export default router;
