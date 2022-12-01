@@ -7,7 +7,8 @@
     "watch": "node src/watch.js",
     "run": "tsc && node .",
     "serve:images": "serve -s file -l 5005",
-    "init:db": "tsc && node dist/initDatabase.js"
+    "init:db": "tsc && node dist/initDatabase.js",
+    "runAllReserves": "tsc && node dist/reserveAll.js"
   },
   "dependencies": {
     "@types/cors": "^2.8.10",

@@ -12,6 +12,7 @@ const down = process.env.DB_DOWN === 'true';
   if (down) {
     await db.schema.dropTableIfExists('router');
     await db.schema.dropTableIfExists('token');
+    await db.schema.dropTableIfExists('reserve_supply');
   }
 
   if (up) {
@@ -38,6 +39,26 @@ const down = process.env.DB_DOWN === 'true';
 
       tableBuilder.unique(['chain_id', 'address'], 'token_i1');
       tableBuilder.index(['chain_id'], 'token_i2');
+    });
+
+    await db.schema.createTable('reserve_supply', (tableBuilder) => {
+      tableBuilder.increments('id');
+
+      tableBuilder.integer('chain_id');
+      tableBuilder.string('router', 100);
+      tableBuilder.string('factory', 100);
+      tableBuilder.string('token0', 100);
+      tableBuilder.string('token1', 100);
+      tableBuilder.string('token0wrapped', 100);
+      tableBuilder.string('token1wrapped', 100);
+      tableBuilder.integer('decimals0');
+      tableBuilder.integer('decimals1');
+      tableBuilder.string('reserve0', 100);
+      tableBuilder.string('reserve1', 100);
+      tableBuilder.string('supply', 100);
+
+      tableBuilder.index(['chain_id', 'token0', 'token1'], 'reserve_supply_i1');
+      tableBuilder.index(['chain_id', 'token0wrapped', 'token1wrapped'], 'reserve_supply_i2');
     });
   }
 
