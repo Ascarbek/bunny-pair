@@ -41,8 +41,8 @@ import uploadGoodsImageHandler from './handlers/uploadGoodsImageHandler';
 router.put('/upload-goods-image', uploadGoodsImageHandler);
 */
 
-import getPairAddress, { getPairAddressSchema } from './handlers/pair-address';
-router.get('/pair-address', validator.query(getPairAddressSchema), getPairAddress);
+import getPairReserves, { getPairReservesSchema } from './handlers/pair-reserves';
+router.get('/pair-reserves', validator.query(getPairReservesSchema), getPairReserves);
 
 import getTokenInfo, { getTokenInfoSchema } from './handlers/token-info';
 router.get('/token-info', validator.query(getTokenInfoSchema), getTokenInfo);

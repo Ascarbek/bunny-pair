@@ -1,39 +1,23 @@
 import db from '../db';
-import { ContainerTypes, ValidatedRequest, ValidatedRequestSchema } from 'express-joi-validation';
-import Joi from 'joi';
-import { ethers } from 'ethers';
+import getProvider from './getProvider';
+import { BigNumber, ethers } from 'ethers';
 import uniRouter from '../ABI/uniRouter';
 import factoryABI from '../ABI/factory';
+import { BASE, null_address } from './constants';
 import LPToken from '../ABI/LPToken';
-import { BigNumber } from 'ethers';
-import { BASE, null_address } from '../helpers/constants';
-import getProvider from '../helpers/getProvider';
-import getTokenInfoDb from '../helpers/getTokenInfoDb';
-import getTokenInfoOnChain from '../helpers/getTokenInfoOnChain';
+import getTokenInfoDb from './getTokenInfoDb';
+import getTokenInfoOnChain from './getTokenInfoOnChain';
+import type { IPairReserves } from '../types/IPairReserves';
 
-interface GetPairAddressRequest {
-  token0: string;
-  token1: string;
-  chain_id: number;
-}
-
-export const getPairAddressSchema = Joi.object({
-  token0: Joi.string().required(),
-  token1: Joi.string().required(),
-  chain_id: Joi.number().required(),
-});
-
-interface GetPairAddressSchema extends ValidatedRequestSchema {
-  [ContainerTypes.Query]: GetPairAddressRequest;
-}
-
-const getPairAddress = async (req: ValidatedRequest<GetPairAddressSchema>, res: any) => {
-  const { token0, token1, chain_id } = req.query;
-
+const getPairReserves: (chain_id: number, token0: string, token1: string) => Promise<IPairReserves[]> = async (
+  chain_id,
+  token0,
+  token1
+) => {
   const routers = await db('router').where('chain_id', chain_id);
   const provider = getProvider(chain_id);
 
-  let result: any[] = [];
+  let result: IPairReserves[] = [];
 
   for (const routerData of routers) {
     const routerAddress = routerData.address;
@@ -107,8 +91,7 @@ const getPairAddress = async (req: ValidatedRequest<GetPairAddressSchema>, res: 
       // mute
     }
   }
-
-  res.json(result);
+  return result;
 };
 
-export default getPairAddress;
+export default getPairReserves;
