@@ -50,9 +50,11 @@ const getAllReserves: (chain_id: number) => Promise<IPairReserves[]> = async (ch
   const pairAddressResponses = await ethcallProvider.all(pairAddressCalls);
   const reserveSupplyCalls = [];
 
+  let allSkips = 0;
   for (let p = 0; p < pairAddressResponses.length; p++) {
     const pairAddress = pairAddressResponses[p];
     if (pairAddress === null_address) {
+      allSkips++;
       continue;
     }
 
@@ -66,6 +68,8 @@ const getAllReserves: (chain_id: number) => Promise<IPairReserves[]> = async (ch
 
   const reserveSupplyResponses = await ethcallProvider.all(reserveSupplyCalls);
 
+  console.log(reserveSupplyResponses.length, allTokens.length*routers.length*4,allTokens.length*routers.length*4 - allSkips*4);
+
   // console.log(reserveSupplyResponses.length, allTokens.length, routers.length, skip);
 
   let result: IPairReserves[] = [];
@@ -76,7 +80,7 @@ const getAllReserves: (chain_id: number) => Promise<IPairReserves[]> = async (ch
     const token1 = allTokens[t].address;
 
     for (let r = 0; r < routers.length; r++) {
-      const pairAddress = pairAddressResponses[t * allTokens.length + r];
+      const pairAddress = pairAddressResponses[t * routers.length + r];
       if (pairAddress === null_address) {
         skip++;
         continue;
@@ -84,19 +88,26 @@ const getAllReserves: (chain_id: number) => Promise<IPairReserves[]> = async (ch
       const k = r - skip;
 
       const routerAddress = routers[r].address;
-      const factoryAddress = factoryWethResponses[k * 2 ];
-      const wrappedNative = factoryWethResponses[k * 2 + 1 ];
+      const factoryAddress = factoryWethResponses[r * 2];
+      const wrappedNative = factoryWethResponses[r * 2 + 1];
 
       const wToken0 = token0 === BASE ? wrappedNative : token0;
       const wToken1 = token1 === BASE ? wrappedNative : token1;
 
-      const pairToken0 = reserveSupplyResponses[t * allTokens.length + k * 4 ];
-      const pairToken1 = reserveSupplyResponses[t * allTokens.length + k * 4 + 1 ];
+      const pairToken0 = reserveSupplyResponses[t * routers.length * 4 + r * 4 - skip*4];
+      const pairToken1 = reserveSupplyResponses[t * routers.length * 4 + r * 4 + 1 - skip*4];
+      if (!pairToken0 || !pairToken1) {
+        console.log('length: ', routers.length);
+        console.log('t: ', t);
+        console.log('r: ', r);
+        console.log('k: ', k);
+        console.log('skip: ', skip);
+      }
       const inOrder =
         pairToken0.toLowerCase() === wToken0.toLowerCase() && pairToken1.toLowerCase() === wToken1.toLowerCase();
 
-      const reservesRaw = reserveSupplyResponses[t * allTokens.length + k * 4 + 2 ];
-      const supplyRaw = reserveSupplyResponses[t * allTokens.length + k * 4 + 3 ];
+      const reservesRaw = reserveSupplyResponses[t * routers.length*4 + r * 4 + 2 - skip*4];
+      const supplyRaw = reserveSupplyResponses[t * routers.length*4 + r * 4 + 3 - skip*4];
 
       const supply = BigNumber.from(supplyRaw._hex).toString();
       const reserve0 = BigNumber.from(reservesRaw._reserve0._hex).toString();
