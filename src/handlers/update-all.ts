@@ -19,7 +19,7 @@ interface GetAllReservesSchema extends ValidatedRequestSchema {
 const getAllReserves = async (req: ValidatedRequest<GetAllReservesSchema>, res: any) => {
   const { chain_id } = req.query;
 
-  const result: IPairReserves[] = await allReserves(chain_id, 100, 0);
+  const result: IPairReserves[] = await allReserves(chain_id, 20, 0);
 
   for (let i = 0; i < result.length; i++) {
     const row = result[i];
