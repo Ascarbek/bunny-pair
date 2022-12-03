@@ -62,7 +62,7 @@ const getAllReserves = async (req: ValidatedRequest<GetAllReservesSchema>, res: 
     });
   }
 
-  res.json({ totalRows: result });
+  res.json({ totalRows: result.length });
 };
 
 export default getAllReserves;
