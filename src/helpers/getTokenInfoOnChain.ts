@@ -8,7 +8,7 @@ const getTokenInfoOnChain: (chain: number, token: string) => Promise<IToken | nu
   token: string
 ) => {
   try {
-    const contract = new ethers.Contract(token, erc20, getProvider(chain));
+    const contract = new ethers.Contract(token, erc20, await getProvider(chain));
     let name = await contract.name();
     let symbol = await contract.symbol();
     let decimals = await contract.decimals();

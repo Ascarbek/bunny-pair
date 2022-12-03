@@ -23,19 +23,19 @@ interface GetAllReservesSchema extends ValidatedRequestSchema {
 const getAllReserves = async (req: ValidatedRequest<GetAllReservesSchema>, res: any) => {
   const { chain_id, limit, offset } = req.query;
 
-  const result: IPairReserves[] = await allReserves(chain_id, limit, offset);
+  const chain: any = await db('chain').where('chain_id', chain_id).first();
 
-  for (let i = 0; i < result.length; i++) {
-    const row = result[i];
+  const coins = [{ address: 'eth' }, ...chain.stable_coins.items];
+  let totalRows = 0;
 
-    const testRows = await db('reserve_supply').where({
-      chain_id: row.chain_id,
-      router: row.router,
-      token0wrapped: row.token0wrapped,
-      token1wrapped: row.token1wrapped,
-    });
+  for (let c = 0; c < coins.length; c++) {
+    const coin = coins[c];
+    const results: IPairReserves[] = await allReserves(chain_id, coin.address, limit, offset);
 
-    if (testRows.length) {
+    for (let i = 0; i < results.length; i++) {
+      totalRows++;
+      const row = results[i];
+
       await db('reserve_supply')
         .where({
           chain_id: row.chain_id,
@@ -44,25 +44,34 @@ const getAllReserves = async (req: ValidatedRequest<GetAllReservesSchema>, res: 
           token1wrapped: row.token1wrapped,
         })
         .delete();
-    }
 
-    await db('reserve_supply').insert({
-      chain_id: row.chain_id,
-      router: row.router,
-      factory: row.factory,
-      token0: row.token0,
-      token1: row.token1,
-      token0wrapped: row.token0wrapped,
-      token1wrapped: row.token1wrapped,
-      decimals0: row.decimals0,
-      decimals1: row.decimals1,
-      reserve0: row.reserve0,
-      reserve1: row.reserve1,
-      supply: row.supply,
-    });
+      await db('reserve_supply')
+        .where({
+          chain_id: row.chain_id,
+          router: row.router,
+          token0: row.token0,
+          token1: row.token1,
+        })
+        .delete();
+
+      await db('reserve_supply').insert({
+        chain_id: row.chain_id,
+        router: row.router,
+        factory: row.factory,
+        token0: row.token0,
+        token1: row.token1,
+        token0wrapped: row.token0wrapped,
+        token1wrapped: row.token1wrapped,
+        decimals0: row.decimals0,
+        decimals1: row.decimals1,
+        reserve0: row.reserve0,
+        reserve1: row.reserve1,
+        supply: row.supply,
+      });
+    }
   }
 
-  res.json({ totalRows: result.length });
+  res.json({ totalRows });
 };
 
 export default getAllReserves;

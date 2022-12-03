@@ -2,6 +2,7 @@ import db from './db';
 import dotenv from 'dotenv';
 import loadRouters from './scripts/loadRouters';
 import loadTokens from './scripts/loadTokens';
+import loadChains from './scripts/loadChains';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const down = process.env.DB_DOWN === 'true';
     await db.schema.dropTableIfExists('router');
     await db.schema.dropTableIfExists('token');
     await db.schema.dropTableIfExists('reserve_supply');
+    await db.schema.dropTableIfExists('chain');
   }
 
   if (up) {
@@ -62,10 +64,23 @@ const down = process.env.DB_DOWN === 'true';
       tableBuilder.unique(['chain_id', 'router', 'token0wrapped', 'token1wrapped'], 'reserve_supply_i3');
       tableBuilder.unique(['chain_id', 'router', 'token0', 'token1'], 'reserve_supply_i4');
     });
+
+    await db.schema.createTable('chain', (tableBuilder) => {
+      tableBuilder.increments('id');
+
+      tableBuilder.integer('chain_id');
+      tableBuilder.string('name', 200);
+      tableBuilder.string('short_name', 200);
+      tableBuilder.jsonb('rpc');
+      tableBuilder.jsonb('stable_coins');
+
+      tableBuilder.unique(['chain_id'], 'chain_i1');
+    });
   }
 
   await loadRouters();
   await loadTokens();
+  await loadChains();
 
   process.exit(0);
 })();

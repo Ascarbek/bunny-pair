@@ -1,6 +1,10 @@
 import { ethers } from 'ethers';
+import db from '../db';
 
-const getProvider = (chain_id: number) =>
-  new ethers.providers.JsonRpcProvider('https://bsc-dataseed1.binance.org', chain_id);
+const getProvider = async (chain_id: number) => {
+  const row = await db('chain').where('chain_id', chain_id).first();
+
+  return new ethers.providers.JsonRpcProvider(row.rpc.items[0], chain_id);
+};
 
 export default getProvider;

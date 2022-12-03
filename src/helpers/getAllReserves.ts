@@ -10,11 +10,12 @@ import getTokenInfoDb from './getTokenInfoDb';
 import getTokenInfoOnChain from './getTokenInfoOnChain';
 import type { IPairReserves } from '../types/IPairReserves';
 
-const getAllReserves: (chain_id: number, limit: number, offset: number) => Promise<IPairReserves[]> = async (
-  chain_id,
-  limit,
-  offset
-) => {
+const getAllReserves: (
+  chain_id: number,
+  connectorToken: string,
+  limit: number,
+  offset: number
+) => Promise<IPairReserves[]> = async (chain_id, connectorToken, limit, offset) => {
   const routers = await db('router').where('chain_id', chain_id);
   const allTokens = await db('token').where('chain_id', chain_id).orderBy('id').limit(limit).offset(offset);
 
@@ -22,7 +23,7 @@ const getAllReserves: (chain_id: number, limit: number, offset: number) => Promi
     return [];
   }
 
-  const provider = getProvider(chain_id);
+  const provider = await getProvider(chain_id);
   const ethcallProvider = new Provider(provider);
   await ethcallProvider.init();
 
@@ -40,7 +41,7 @@ const getAllReserves: (chain_id: number, limit: number, offset: number) => Promi
 
   const pairAddressCalls = [];
   for (let t = 0; t < allTokens.length; t++) {
-    const token0 = 'eth';
+    const token0 = connectorToken;
     const token1 = allTokens[t].address;
 
     for (let r = 0; r < factoryWethResponses.length / 2; r++) {

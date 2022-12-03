@@ -16,7 +16,7 @@ const getPairReserves: (chain_id: number, token0: string, token1: string) => Pro
   token1
 ) => {
   const routers = await db('router').where('chain_id', chain_id);
-  const provider = getProvider(chain_id);
+  const provider = await getProvider(chain_id);
   const ethcallProvider = new Provider(provider);
   await ethcallProvider.init();
 
