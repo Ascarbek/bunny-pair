@@ -6,10 +6,14 @@ import type { IPairReserves } from '../types/IPairReserves';
 
 interface GetAllReservesRequest {
   chain_id: number;
+  limit: number;
+  offset: number;
 }
 
 export const getAllReservesSchema = Joi.object({
   chain_id: Joi.number().required(),
+  limit: Joi.number().required(),
+  offset: Joi.number().required(),
 });
 
 interface GetAllReservesSchema extends ValidatedRequestSchema {
@@ -17,12 +21,30 @@ interface GetAllReservesSchema extends ValidatedRequestSchema {
 }
 
 const getAllReserves = async (req: ValidatedRequest<GetAllReservesSchema>, res: any) => {
-  const { chain_id } = req.query;
+  const { chain_id, limit, offset } = req.query;
 
-  const result: IPairReserves[] = await allReserves(chain_id, 100, 0);
+  const result: IPairReserves[] = await allReserves(chain_id, limit, offset);
 
   for (let i = 0; i < result.length; i++) {
     const row = result[i];
+
+    const testRows = await db('reserve_supply').where({
+      chain_id: row.chain_id,
+      router: row.router,
+      token0wrapped: row.token0wrapped,
+      token1wrapped: row.token1wrapped,
+    });
+
+    if (testRows.length) {
+      await db('reserve_supply')
+        .where({
+          chain_id: row.chain_id,
+          router: row.router,
+          token0wrapped: row.token0wrapped,
+          token1wrapped: row.token1wrapped,
+        })
+        .delete();
+    }
 
     await db('reserve_supply').insert({
       chain_id: row.chain_id,
@@ -40,7 +62,7 @@ const getAllReserves = async (req: ValidatedRequest<GetAllReservesSchema>, res: 
     });
   }
 
-  res.json(result);
+  res.json({ totalRows: result });
 };
 
 export default getAllReserves;

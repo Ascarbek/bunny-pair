@@ -59,6 +59,8 @@ const down = process.env.DB_DOWN === 'true';
 
       tableBuilder.index(['chain_id', 'token0', 'token1'], 'reserve_supply_i1');
       tableBuilder.index(['chain_id', 'token0wrapped', 'token1wrapped'], 'reserve_supply_i2');
+      tableBuilder.unique(['chain_id', 'router', 'token0wrapped', 'token1wrapped'], 'reserve_supply_i3');
+      tableBuilder.unique(['chain_id', 'router', 'token0', 'token1'], 'reserve_supply_i4');
     });
   }
 
